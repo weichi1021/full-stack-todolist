@@ -1,0 +1,58 @@
+  // width
+  $size: (
+    0: 0px,
+    5: 5px,
+    10: 10px,
+    15: 15px,
+    20: 20px,
+    25: 25px,
+    30: 30px,
+  ) !default;
+
+  @each $n, $s in $size {
+    // margin
+    .mt#{$n} {
+      margin-top: $s !important;
+    }
+    .mr#{$n} {
+      margin-right: $s !important;
+    }
+    .mb#{$n} {
+      margin-bottom: $s !important;
+    }
+    .ml#{$n} {
+      margin-left: $s !important;
+    }
+    .mtb#{$n} {
+      margin-top: $s !important;
+      margin-bottom: $s !important;
+    }
+    .mrl#{$n} {
+      margin-right: $s !important;
+      margin-left: $s !important;
+    }
+    // padding
+    .p#{$n} {
+      padding: $s !important;
+    }
+    .pt#{$n} {
+      padding-top: $s !important;
+    }
+    .pr#{$n} {
+      padding-right: $s !important;
+    }
+    .pb#{$n} {
+      padding-bottom: $s !important;
+    }
+    .pl#{$n} {
+      padding-left: $s !important;
+    }
+    .ptb#{$n} {
+      padding-top: $s !important;
+      padding-bottom: $s !important;
+    }
+    .prl#{$n} {
+      padding-right: $s !important;
+      padding-left: $s !important;
+    }
+  }
