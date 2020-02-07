@@ -21,6 +21,10 @@ router.post('/todo-list',async (req, res, next) => {
         await db.add(title, content);
         res.json({})
         break;
+      case 'save_note':
+        await db.save(id, title, content);
+        res.json({})
+        break;
       case 'delete_note':
         await db.delete(id);
         res.json({})

@@ -1,7 +1,10 @@
 <template lang="pug">
   section(name="tl-notes-container")
     div.mb25.pt25.prl30(v-if="!isTrash")
-      .text-line(v-show="!showTextBox", @click="addTextBox()") Take a note...
+      .text-line(v-show="!showTextBox")
+        .text-line-input(@click="addTextBox()") Take a note...
+        //- el-button(type="text")
+        //-   i.el-icon-finished
       .text-box(v-show="showTextBox")
         .header
           el-input(type="text", v-model="param.title", placeholder="Title")
@@ -12,16 +15,18 @@
     div.notes-container(@click="blurTextBox($event)")
       .notes-group(v-for="(item, index) in notesList", :key="`notes-${index}`")
         .header(v-if="item.title") {{ item.title }}
-        .conten(v-if="item.content") {{ item.content }}
+        .conten(v-if="item.content")
+          pre {{ item.content }}
+        .content(v-if="!item.title && !item.content") Empty note
         .footer.btn-pos-right(v-if="!isTrash")
-          el-button(type="text", @click="editTextBox(item)")
+          el-button.text-primay(type="text", @click="editTextBox(item)")
             i.el-icon-edit
-          el-button(type="text", @click="removeNotes(item.id)")
+          el-button(type="text", @click="removeNote(item.id)")
             i.el-icon-delete
         .footer.btn-pos-left(v-if="isTrash")
           el-button(type="text", @click="deleteTextBox(item.id)")
             i.el-icon-delete-solid
-          el-button(type="text", @click="restoreNotes(item.id)")
+          el-button(type="text", @click="restoreNote(item.id)")
             i.el-icon-refresh-left
     el-dialog(:visible.sync="editModalVisible", width="500px", :show-close="false", @close="closeTextBox()")
       .text-box
@@ -31,6 +36,7 @@
           el-input(type="textarea", v-model="param.content", :rows="4", resize="none", placeholder="Take a note...")
         .footer.text-right
           el-button(type="text", @click="closeTextBox()") Close
+          el-button.text-primay(type="text", @click="saveNotes()") Save
 </template>
 
 <script>
@@ -41,8 +47,10 @@ export default {
   data() {
     return {
       showTextBox: false,
+      isCheckList: true,
       editModalVisible: false,
       param: {
+        id: null,
         title: '',
         content: ''
       },
@@ -68,9 +76,7 @@ export default {
     verify() {
       let pass = true
       let verifyList = Object.keys(this.param);
-      verifyList.forEach(item => {
-        pass = !(this.param[item].trim() == '')
-      })
+      pass = !(this.param.title.trim() == '' && this.param.content.trim() == '')
       console.log('verify = '+ pass)
       return pass
     },
@@ -92,14 +98,15 @@ export default {
       if(this.showTextBox && !this.editModalVisible && !eltextBox.contains(event.target)){
         this.showTextBox = false;
         if(!this.verify()) return
-        this.addNotes()
+        this.addNote()
         console.log('add note')
       }
     },
     editTextBox(item) {
-      this.editModalVisible = true;
+      this.param.id = item.id;
       this.param.title = item.title;
       this.param.content = item.content;
+      this.editModalVisible = true;
       setTimeout(() => {
         document.querySelector('.el-dialog .text-box>.header input').focus()
       }, 300)
@@ -109,7 +116,7 @@ export default {
         confirmButtonText: 'Delete',
         cancelButtonText: 'Cancel',
       }).then(({ value }) => {
-        this.deleteNotes(id);
+        this.deleteNote(id);
       })
   },
     // api
@@ -126,7 +133,7 @@ export default {
         // console.log(err)
       }
     },
-    async addNotes() {
+    async addNote() {
       try{
         const resp = await axios.post('/api/todo-list', {
           action: 'add_note',
@@ -138,7 +145,20 @@ export default {
         console.log(err)
       }
     },
-    async removeNotes(id) {
+    async saveNotes(item) {
+      try{
+        const resp = await axios.post('/api/todo-list', {
+          action: 'save_note',
+          data: this.param
+        })
+        this.closeTextBox()
+        this.queryTodoList()
+        console.log(resp)
+      }catch(err){
+        console.log(err)
+      }
+    },
+    async removeNote(id) {
       try{
         const resp = await axios.post('/api/todo-list', {
           action: 'change_active_note',
@@ -153,7 +173,7 @@ export default {
         console.log(err)
       }
     },
-    async restoreNotes(id) {
+    async restoreNote(id) {
       try{
         const resp = await axios.post('/api/todo-list', {
           action: 'change_active_note',
@@ -168,7 +188,7 @@ export default {
         console.log(err)
       }
     },
-    async deleteNotes(id) {
+    async deleteNote(id) {
       try{
         const resp = await axios.post('/api/todo-list', {
           action: 'delete_note',
@@ -195,17 +215,22 @@ export default {
     max-width: 500px
     margin: 0px auto
   .text-line
+    display: flex
+    justify-content: space-between
+    align-items: center
     padding: 10px
-    cursor: text
-  .text-box .footer
-    padding: 10px 15px
+    .text-line-input
+      width: 100%
+      cursor: text
+  .text-box
+    padding: 10px 0px
+    .footer
+      padding: 10px 15px 0px
   .notes-container
     padding: 0px 20px
-    display: flex
-    flex-wrap: wrap
   .notes-group
     position: relative
-    display: inline-block
+    display: inline-table
     border: 1px solid #E4E7ED
     border-radius: 5px
     padding: 15px 15px 35px
@@ -226,6 +251,9 @@ export default {
       right: 0px
     &:hover .footer.btn-pos-left
       left: 0px
+  pre
+    font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif
+    line-height: 1.5
 </style>
 <style lang="sass">
   .text-box .el-input>input,
@@ -238,20 +266,21 @@ export default {
     color: #606266
   .text-box .el-input>input
     font-weight: bold
-  .text-box .footer .el-button,
-  .notes-group .footer .el-button
+  .el-button
     color: #606266
     font-size: 14px
     padding: 8px
     &:hover
+      color: #606266
       background-color: #f4f4f5
+    &.text-primay:hover
+      background-color: #ecf5ff
   .el-dialog
     border-radius: 5px
     .text-box
       box-shadow: none
       border: none
-    .el-dialog__header
-      padding: 0px
+    .el-dialog__header,
     .el-dialog__body
-      padding: 5px
+      padding: 0px
 </style>

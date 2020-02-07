@@ -29,6 +29,15 @@ note.add = (title, content) => {
     })
   })
 }
+note.save = (id, title, content) => {
+  return new Promise((resolve, reject) => {
+    const sql = `UPDATE notes SET title = '${title}', content = '${content}' WHERE id = ${id}`;
+    pool.query(sql, (err, results) => {
+      if(err) return reject(err)
+      return resolve(results)
+    })
+  })
+}
 note.changeActive = (id, active) => {
   return new Promise((resolve, reject) => {
     // const sql = `DELETE FROM notes WHERE id = ${id}`;
