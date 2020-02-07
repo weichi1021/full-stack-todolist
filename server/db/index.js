@@ -11,9 +11,9 @@ const pool = mysql.createPool({
 
 let note = {}
 
-note.all = () => {
+note.list = (active) => {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM notes WHERE is_active = 1`
+    const sql = `SELECT * FROM notes WHERE is_active = ${active}`
     pool.query(sql, (err, results) => {
       if(err) return reject(err)
       return resolve(results)
@@ -29,10 +29,19 @@ note.add = (title, content) => {
     })
   })
 }
-note.delete = (id) => {
+note.changeActive = (id, active) => {
   return new Promise((resolve, reject) => {
     // const sql = `DELETE FROM notes WHERE id = ${id}`;
-    const sql = `DELETE FROM notes SET is_active = 0 WHERE id = ${id}`;
+    const sql = `UPDATE notes SET is_active = ${active} WHERE id = ${id}`;
+    pool.query(sql, (err, results) => {
+      if(err) return reject(err)
+      return resolve(results)
+    })
+  })
+}
+note.delete = (id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `DELETE FROM notes WHERE id = ${id}`;
     pool.query(sql, (err, results) => {
       if(err) return reject(err)
       return resolve(results)

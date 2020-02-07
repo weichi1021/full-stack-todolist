@@ -1,23 +1,34 @@
 <template lang="pug">
   section(name="tl-menu-group")
-    el-menu
-      el-menu-item(index="1")
+    el-menu(:default-active="menuActive", @select="setMenu")
+      el-menu-item(index="notes")
         i.el-icon-notebook-2
         span Notes
-    el-divider
-    //- el-menu
-    //-   el-menu-item(index="0")
-    //-     i.el-icon-collection-tag
-    //-     span AAA
-    //-   el-menu-item(index="1")
-    //-     i.el-icon-edit
-    //-     span Edit label
-    //- el-divider
-    el-menu
-      el-menu-item(index="1" divided)
+      //- el-divider
+      //-   el-menu-item(index="0")
+      //-     i.el-icon-collection-tag
+      //-     span AAA
+      //-   el-menu-item(index="1")
+      //-     i.el-icon-edit
+      //-     span Edit label
+      //- el-divider
+      el-menu-item(index="trash")
         i.el-icon-delete
         span Trash
 </template>
+
+<script>
+import { mapState, mapMutations } from 'vuex'
+
+export default {
+  computed: {
+    ...mapState(['menuActive'])
+  },
+  methods: {
+    ...mapMutations(['setMenu']),
+  }
+}
+</script>
 
 
 <style lang="sass" scoped>
