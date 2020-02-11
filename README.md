@@ -3,7 +3,7 @@
 > 作品網址：https://full-stack-todolist.herokuapp.com/
 
 ### 製作功能
-* 新增、編輯、刪除筆記
+* 新增、編輯、刪除、刪除後復原筆記
 * 垃圾桶等列表
 
 ### 使用技術
