@@ -1,39 +1,42 @@
 const express = require('express')
-const db = require('../db')
+const NoteController = require('../../controller/NoteController')
 const router = express.Router();
 
 router.post('/todo-list',async (req, res, next) => {
   try{
     let results = null;
-    let { id, active, title, content } = req.body.data || {}
     console.log(req.body)
     switch(req.body.action) {
       case 'query_todo_list':
-        results = await db.list(1);
+        results = await NoteController.read(1);
         res.json(results)
-        // res.json([])
         break;
+
       case 'query_trash_todo_list':
-        results = await db.list(0);
+        results = await NoteController.read(0);
         res.json(results)
         break;
+
       case 'add_note':
-        await db.add(title, content);
-        res.json({})
+        results = await NoteController.create(req.body.data)
+        res.json(results)
         break;
+
       case 'save_note':
-        await db.save(id, title, content);
-        res.json({})
+        results = await NoteController.update(req.body.data);
+        res.json(results)
         break;
+
       case 'delete_note':
-        await db.delete(id);
-        res.json({})
+        results = await NoteController.delete(req.body.data);
+        res.json(results)
         break;
+
       case 'change_active_note':
-        // console.log(id)
-        await db.changeActive(id, active);
-        res.json({})
+        results = await NoteController.changeActive(req.body.data);
+        res.json(results)
         break;
+
       default:
         break;
     }
