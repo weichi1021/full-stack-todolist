@@ -4,9 +4,9 @@ const TagController = require('../../controllers/TagController')
 const router = express.Router();
 
 router.post('/todo-list', async (req, res, next) => {
+  console.log(req.body)
   try{
     let results = null;
-    console.log(req.body)
     switch(req.body.action) {
       case 'query_todo_list':
         results = await NoteController.read(req.body.data);

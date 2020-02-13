@@ -11,8 +11,8 @@ note.create = (title, content) => {
     })
   })
 }
-note.read = (active) => {
-  return new Promise((resolve, reject) => {
+note.read = async (active) => {
+  return await new Promise((resolve, reject) => {
     const sql = `SELECT id, title, content FROM notes WHERE is_active = ${active};`
     pool.query(sql, (err, results) => {
       if(err) return reject(err)

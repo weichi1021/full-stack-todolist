@@ -8,9 +8,9 @@
       el-menu-item(:index="`tag-${item.id}`", v-for="(item, index) in tagList", :key="`tagMenu-${index}`")
         i.el-icon-collection-tag
         span {{ item.display_name }}
-      el-menu-item(index="edit")
-        i.el-icon-edit
-        span Edit label
+      //- el-menu-item(index="edit")
+      //-   i.el-icon-edit
+      //-   span Edit label
       el-divider
       el-menu-item(index="trash")
         i.el-icon-delete
@@ -22,27 +22,11 @@ import axios from 'axios'
 import { mapState, mapMutations } from 'vuex'
 
 export default {
-  data() {
-    return {
-      tagList: [],
-    }
-  },
-  created() {
-    this.getTagList();
-  },
   computed: {
-    ...mapState(['menuActive'])
+    ...mapState(['menuActive', 'tagList'])
   },
   methods: {
     ...mapMutations(['setMenu']),
-    async getTagList() {
-      try{
-        const resp = await axios.get('/api/tags')
-        this.tagList = resp.data;
-      }catch(err){
-        console.log(err.response)
-      }
-    }
   }
 }
 </script>

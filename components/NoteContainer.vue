@@ -56,7 +56,7 @@
 <script>
 import axios from 'axios'
 import _findIndex from 'lodash/findIndex'
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 
 export default {
   data() {
@@ -78,6 +78,7 @@ export default {
   },
   created() {
     this.loading = this.$loading({ lock: true });
+    this.getTagList()
     this.queryTodoList();
   },
   watch: {
@@ -104,6 +105,7 @@ export default {
     },
   },
   methods: {
+    ...mapMutations(['setTagList']),
     // function
     delay(interval) {
       return new Promise((resolve) => {
@@ -173,7 +175,7 @@ export default {
     // api
     async queryTodoList() {
       try{
-        const resp = await axios.post('/api/todo-list', {
+        const resp = await axios.post('/api/todo-list',  {
           action: 'query_todo_list',
           data: {
             active: !this.isTrash
@@ -182,7 +184,7 @@ export default {
         this.notesList = resp.data;
         // console.log(resp)
       }catch(err){
-        // console.log(err)
+        // console.log('query_todo_list', err)
       }
       await this.delay(500);
       if(this.loading) this.loading.close();
@@ -194,9 +196,9 @@ export default {
           data: this.param
         })
         this.queryTodoList()
-        console.log(resp)
+        // console.log(resp)
       }catch(err){
-        console.log(err)
+        // console.log('add_note', err)
       }
     },
     async saveNotes(item) {
@@ -207,9 +209,9 @@ export default {
         })
         this.closeTextBox()
         this.queryTodoList()
-        console.log(resp)
+        // console.log(resp)
       }catch(err){
-        console.log(err)
+        // console.log('save_note', err)
       }
     },
     async removeNote(id) {
@@ -222,9 +224,9 @@ export default {
           }
         })
         this.queryTodoList()
-        console.log(resp)
+        // console.log(resp)
       }catch(err){
-        console.log(err)
+        // console.log('change_active_note', err)
       }
     },
     async restoreNote(id) {
@@ -237,9 +239,9 @@ export default {
           }
         })
         this.queryTodoList()
-        console.log(resp)
+        // console.log(resp)
       }catch(err){
-        console.log(err)
+        // console.log('change_active_note', err)
       }
     },
     async deleteNote(id) {
@@ -249,9 +251,17 @@ export default {
           data: { id }
         })
         this.queryTodoList()
-        console.log(resp)
+        // console.log(resp)
       }catch(err){
-        console.log(err)
+        // console.log('delete_note', err)
+      }
+    },
+    async getTagList() {
+      try{
+        const resp = await axios.get('/api/tags')
+        this.setTagList(resp.data);
+      }catch(err){
+        // console.log(err)
       }
     },
     async getNoteByTid(tid) {
@@ -260,7 +270,7 @@ export default {
         this.notesList = resp.data;
         // console.log(resp)
       }catch(err){
-        // console.log(err)
+        // console.log(`tags ${tid}`, err)
       }
       await this.delay(2000);
       if(this.loading) this.loading.close();

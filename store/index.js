@@ -1,25 +1,16 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-
-Vue.use(Vuex)
-
-const state = {
+export const state = () => ({
   menuActive: 'notes',
+  tagList: [],
+})
+
+export const getters = {
 }
 
-const getters = {
-}
-
-const mutations = {
+export const mutations = {
   setMenu (state, payload) {
     state.menuActive = payload
   },
+  setTagList (state, payload) {
+    state.tagList = payload
+  },
 }
-
-const store = () => new Vuex.Store({
-  state,
-  getters,
-  mutations,
-})
-
-export default store;
