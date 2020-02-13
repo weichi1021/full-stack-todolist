@@ -61,6 +61,7 @@ import { mapState } from 'vuex'
 export default {
   data() {
     return {
+      loading: null,
       showTextBox: false,
       isCheckList: true,
       editModalVisible: false,
@@ -76,10 +77,16 @@ export default {
     }
   },
   created() {
+    this.loading = this.$loading({ lock: true });
     this.queryTodoList();
   },
   watch: {
-    menuActive() {
+    async menuActive() {
+      this.loading = this.$loading({
+        target: document.querySelector('[name="tl-notes-container"]'),
+        lock: true
+      });
+      await this.delay(1000);
       this.queryTodoList()
     }
   },
@@ -90,6 +97,12 @@ export default {
     },
   },
   methods: {
+    // function
+    delay(interval) {
+      return new Promise((resolve) => {
+        setTimeout(resolve, interval);
+      })
+    },
     // verify
     verify() {
       let pass = true
@@ -163,6 +176,8 @@ export default {
       }catch(err){
         // console.log(err)
       }
+      await this.delay(2000);
+      if(this.loading) this.loading.close();
     },
     async addNote() {
       try{
