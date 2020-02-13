@@ -18,7 +18,8 @@ class NoteController {
     return { id: results.insertId }
   }
   async read(payload) {
-    let results = await NoteModel.read(payload);
+    let { active } = payload
+    let results = await NoteModel.read(active);
     results = JSON.parse(JSON.stringify(results))
     return await Promise.all(results.map(async (item) => {
       const tags = await TagController.getTagsByNid(item.id);

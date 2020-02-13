@@ -165,11 +165,12 @@ export default {
     },
     // api
     async queryTodoList() {
-      let apiAction = 'query_todo_list' // active list
-      if(this.isTrash) apiAction = 'query_trash_todo_list' // inactive list
       try{
         const resp = await axios.post('/api/todo-list', {
-          action: apiAction
+          action: 'query_todo_list',
+          data: {
+            active: this.isTrash
+          }
         })
         this.notesList = resp.data;
         // console.log(resp)

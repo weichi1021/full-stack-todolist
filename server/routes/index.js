@@ -8,12 +8,7 @@ router.post('/todo-list',async (req, res, next) => {
     console.log(req.body)
     switch(req.body.action) {
       case 'query_todo_list':
-        results = await NoteController.read(1);
-        res.json(results)
-        break;
-
-      case 'query_trash_todo_list':
-        results = await NoteController.read(0);
+        results = await NoteController.read(req.body.data);
         res.json(results)
         break;
 
