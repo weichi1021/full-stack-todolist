@@ -18,6 +18,8 @@
         .conten(v-if="item.content")
           pre {{ item.content }}
         .content(v-if="!item.title && !item.content") Empty note
+        .tag-group.mt10
+          el-tag(type="info" v-for="(tagItem, tagIndex) in item.tags", :key="`tags-${tagIndex}`") {{ tagItem.display_name }}
         .footer.btn-pos-right(v-if="!isTrash")
           el-button.text-primay(type="text", @click="editTextBox(item)")
             i.el-icon-edit
@@ -251,6 +253,8 @@ export default {
       right: 0px
     &:hover .footer.btn-pos-left
       left: 0px
+    .tag-group>.el-tag + .el-tag
+      margin-left: 5px
   pre
     font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif
     line-height: 1.5

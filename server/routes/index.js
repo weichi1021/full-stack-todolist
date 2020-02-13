@@ -1,5 +1,5 @@
 const express = require('express')
-const NoteController = require('../../controller/NoteController')
+const NoteController = require('../../controllers/NoteController')
 const router = express.Router();
 
 router.post('/todo-list',async (req, res, next) => {
