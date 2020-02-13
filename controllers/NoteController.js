@@ -51,6 +51,14 @@ class NoteController {
     await NoteModel.changeActive(id, active);
     return { id }
   }
+  async getNoteByTid(payload) {
+    let results = await NoteModel.getNoteByTid(payload);
+    results = JSON.parse(JSON.stringify(results))
+    return await Promise.all(results.map(async (item) => {
+      const tags = await TagController.getTagsByNid(item.id);
+      return { ...item, tags }
+    }))
+  }
 }
 
 module.exports = new NoteController();

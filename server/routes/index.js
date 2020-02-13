@@ -1,8 +1,9 @@
 const express = require('express')
 const NoteController = require('../../controllers/NoteController')
+const TagController = require('../../controllers/TagController')
 const router = express.Router();
 
-router.post('/todo-list',async (req, res, next) => {
+router.post('/todo-list', async (req, res, next) => {
   try{
     let results = null;
     console.log(req.body)
@@ -36,6 +37,25 @@ router.post('/todo-list',async (req, res, next) => {
         break;
     }
   }catch(err){
+    console.log('err 500')
+    res.sendStatus(500)
+  }
+})
+
+router.get('/tags', async (req, res, next) => {
+  try{
+    let results = await TagController.read();
+    res.json(results)
+  }catch{
+    console.log('err 500')
+    res.sendStatus(500)
+  }
+})
+router.post('/tags/:id', async (req, res, next) => {
+  try{
+    let results = await NoteController.getNoteByTid(req.params.id);
+    res.json(results)
+  }catch{
     console.log('err 500')
     res.sendStatus(500)
   }

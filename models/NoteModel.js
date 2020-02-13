@@ -65,5 +65,14 @@ note.undoTag = (nid) => {
     })
   })
 }
+note.getNoteByTid = (tid) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT r.nid AS id, n.title, n.content FROM relation AS r LEFT JOIN notes AS n ON n.id = r.nid WHERE r.tid = ${tid};`
+    pool.query(sql, (err, results) => {
+      if(err) return reject(err)
+      return resolve(results)
+    })
+  })
+}
 
 module.exports = note;

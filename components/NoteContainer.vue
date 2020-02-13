@@ -81,13 +81,20 @@ export default {
     this.queryTodoList();
   },
   watch: {
-    async menuActive() {
+    async menuActive(val) {
+      console.log(val)
+      if(val == 'edit') return
       this.loading = this.$loading({
         target: document.querySelector('[name="tl-notes-container"]'),
         lock: true
       });
       await this.delay(1000);
-      this.queryTodoList()
+      if(/tag/.test(val)){
+        const tid = val.replace('tag-', '')
+        this.getNoteByTid(tid);
+      }else{
+        this.queryTodoList()
+      }
     }
   },
   computed: {
@@ -169,7 +176,7 @@ export default {
         const resp = await axios.post('/api/todo-list', {
           action: 'query_todo_list',
           data: {
-            active: this.isTrash
+            active: !this.isTrash
           }
         })
         this.notesList = resp.data;
@@ -177,7 +184,7 @@ export default {
       }catch(err){
         // console.log(err)
       }
-      await this.delay(2000);
+      await this.delay(500);
       if(this.loading) this.loading.close();
     },
     async addNote() {
@@ -246,6 +253,17 @@ export default {
       }catch(err){
         console.log(err)
       }
+    },
+    async getNoteByTid(tid) {
+      try{
+        const resp = await axios.post(`/api/tags/${tid}`)
+        this.notesList = resp.data;
+        // console.log(resp)
+      }catch(err){
+        // console.log(err)
+      }
+      await this.delay(2000);
+      if(this.loading) this.loading.close();
     },
   }
 }

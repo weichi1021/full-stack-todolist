@@ -3,8 +3,7 @@
     el-header
       header-bar
     el-container
-      el-aside(width="200px")
-        menu-bar.mt5
+      menu-bar.mt5
       el-main.ptb0.prl0
         note-container
 </template>
@@ -28,5 +27,7 @@ export default {
   .el-header
     padding: 0px
     border-bottom: 1px solid #e6e6e6
+  .el-main
+    max-height: calc(100vh - 60px)
 </style>
 
