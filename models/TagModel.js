@@ -65,5 +65,14 @@ tag.getTagsByNid = (nid) => {
     })
   })
 }
+tag.deleteRelation = (id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `DELETE FROM relation WHERE tid = ${id};`;
+    pool.query(sql, (err, results) => {
+      if(err) return reject(err)
+      return resolve(results)
+    })
+  })
+}
 
 module.exports = tag;

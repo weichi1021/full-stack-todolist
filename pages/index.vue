@@ -29,5 +29,6 @@ export default {
     border-bottom: 1px solid #e6e6e6
   .el-main
     max-height: calc(100vh - 60px)
+    overflow-y: scroll
 </style>
 

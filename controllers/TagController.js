@@ -10,14 +10,15 @@ class TagController {
     let results = await TagModel.read();
     return results
   }
-  async update(payload) {
-    let { id, display_name } = payload
+  async update(id, payload) {
+    let { display_name } = payload
     await TagModel.update(id, display_name);
     return { id }
   }
-  async delete(payload) {
-    let { id } = payload
+  async delete(id) {
+    console.log(id)
     await TagModel.delete(id);
+    await TagModel.deleteRelation(id)
     return {}
   }
   async find(display_name) {

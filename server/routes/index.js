@@ -60,5 +60,31 @@ router.post('/tags/:id', async (req, res, next) => {
     res.sendStatus(500)
   }
 })
+router.put('/tags/:id', async (req, res, next) => {
+  try{
+    console.log(req.body.action)
+    switch (req.body.action) {
+      case 'update_tag':
+        let results = await TagController.update(req.params.id, req.body.data);
+        res.json(results)
+        break;
+
+      default:
+        break;
+    }
+  }catch{
+    console.log('err 500')
+    res.sendStatus(500)
+  }
+})
+router.delete('/tags/:id', async (req, res, next) => {
+  try{
+    let results = await TagController.delete(req.params.id);
+    res.json(results)
+  }catch{
+    console.log('err 500')
+    res.sendStatus(500)
+  }
+})
 
 module.exports = router;

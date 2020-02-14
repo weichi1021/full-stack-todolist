@@ -1,5 +1,6 @@
 <template lang="pug">
   section(name="tl-notes-container")
+    //- input
     div.mb25.pt25.prl30(v-if="!isTrash")
       .text-line(v-show="!showTextBox")
         .text-line-input(@click="clickTextBox()") Take a note...
@@ -18,6 +19,7 @@
           div
             el-button(type="text", @click="closeTextBox()") Close
             el-button.text-primay(type="text", @click="addTextBox()") Create
+    //- show
     div.notes-container
       .notes-group(v-for="(item, index) in notesList", :key="`notes-${index}`")
         .header(v-if="item.title") {{ item.title }}
@@ -36,7 +38,8 @@
             i.el-icon-delete-solid
           el-button(type="text", @click="restoreNote(item.id)")
             i.el-icon-refresh-left
-    el-dialog(:visible.sync="editModalVisible", width="500px", :show-close="false", @close="closeTextBox()")
+    //- modal
+    el-dialog.text-box-dialog(:visible.sync="editModalVisible", width="500px", :show-close="false", @close="closeTextBox()")
       .text-box
         .header
           el-input(type="text", v-model="param.title", placeholder="Title")
@@ -56,7 +59,7 @@
 <script>
 import axios from 'axios'
 import _findIndex from 'lodash/findIndex'
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapMutations, mapActions } from 'vuex'
 
 export default {
   data() {
@@ -106,6 +109,7 @@ export default {
   },
   methods: {
     ...mapMutations(['setTagList']),
+    ...mapActions(['getTagList']),
     // function
     delay(interval) {
       return new Promise((resolve) => {
@@ -256,14 +260,6 @@ export default {
         // console.log('delete_note', err)
       }
     },
-    async getTagList() {
-      try{
-        const resp = await axios.get('/api/tags')
-        this.setTagList(resp.data);
-      }catch(err){
-        // console.log(err)
-      }
-    },
     async getNoteByTid(tid) {
       try{
         const resp = await axios.post(`/api/tags/${tid}`)
@@ -371,7 +367,7 @@ export default {
       background-color: #f4f4f5
     &.text-primay:hover
       background-color: #ecf5ff
-  .el-dialog
+  .text-box-dialog .el-dialog
     border-radius: 5px
     .text-box
       box-shadow: none
