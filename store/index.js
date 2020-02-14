@@ -4,6 +4,7 @@ export const state = () => ({
   menuActive: 'notes',
   tagList: [],
   noteList: [],
+  tagMaintainModalVisible: false,
 })
 
 export const getters = {
@@ -19,6 +20,9 @@ export const mutations = {
   },
   setNoteList (state, payload) {
     state.noteList = payload
+  },
+  setTagMaintainModalVisible (state, payload) {
+    state.tagMaintainModalVisible = payload
   },
 }
 

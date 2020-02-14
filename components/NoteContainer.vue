@@ -19,7 +19,7 @@
         //- el-button(type="text")
         //-   i.el-icon-finished
     //- container
-    div
+    div.filter-note-list
       .notes-group(v-for="(item, index) in noteList", :key="`notes-${index}`")
         .header(v-if="item.title") {{ item.title }}
         .conten(v-if="item.content")
@@ -63,8 +63,7 @@ export default {
   data() {
     return {
       loading: null,
-      showTextBox: true,
-      isCheckList: true,
+      showTextBox: false,
       editModalVisible: false,
       tagInput: '',
       param: {
@@ -288,6 +287,9 @@ export default {
         margin-left: 10px
     .input-new-tag
       width: 110px
+  .filter-note-list
+    display: flex
+    flex-wrap: wrap
   .notes-group
     position: relative
     display: inline-table
@@ -325,5 +327,9 @@ export default {
       background-color: $infoColor3
     &.text-primay:hover
       background-color: $primaryColor10
+
+  @media (max-width: 992px)
+    .filter-note-list
+      justify-content: center
 </style>
 

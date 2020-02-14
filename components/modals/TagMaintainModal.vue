@@ -1,5 +1,5 @@
 <template lang="pug">
-  el-dialog.tag-maintain-dialog(title="Edit Tags", :visible.sync="modalVisible", width="300px", @close="resetData()")
+  el-dialog.tag-maintain-dialog(title="Edit Tags", :visible="tagMaintainModalVisible", width="300px", @close="closeModal()")
     .body
       .tag-item
         el-input(v-model="tagInput", placeholder="Create new tag", @focus="resetData()")
@@ -17,17 +17,16 @@
           el-button.note-action(@click="btnDelete(item.id)")
             i.el-icon-delete
     .footer.text-right
-      el-button(type="text", @click="modalVisible = false") Done
+      el-button(type="text", @click="closeModal()") Done
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapMutations, mapActions } from 'vuex'
 import axios from 'axios'
 
 export default {
   data() {
     return {
-      modalVisible: false,
       tagInput: '',
       params: {
         id: null,
@@ -36,16 +35,21 @@ export default {
     }
   },
   computed: {
-    ...mapState(['tagList'])
+    ...mapState(['tagList', 'tagMaintainModalVisible'])
   },
   methods: {
     ...mapActions(['getTagList', 'getNoteListByMenu']),
+    ...mapMutations(['setTagMaintainModalVisible']),
     resetData(scrollTop = true) {
       this.tagInput = '';
       Object.assign(this.$data.params, this.$options.data().params)
       if(scrollTop) document.querySelector('.tag-maintain-dialog .body').scrollTop = 0;
     },
     // trigger
+    closeModal() {
+      this.setTagMaintainModalVisible(false)
+      this.resetData();
+    },
     btnAdd() {
       if(this.tagInput.trim().length == 0) return
       this.createTag();
