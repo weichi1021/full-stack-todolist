@@ -1,7 +1,9 @@
 <template lang="pug">
   section(name="tl-header")
-    div
+    .header-title
       i.el-icon-notebook-2.mr5
+      span.mobile-menu-name.hidden-md-and-up {{ menuDisplayName }}
+      span.hidden-md-and-up &nbsp;|&nbsp;
       span Note List
     el-dropdown.hidden-md-and-up(@command="handleCommand")
       span
@@ -9,7 +11,7 @@
       el-dropdown-menu
         el-dropdown-item(icon="el-icon-notebook-2", command="notes")
           span Notes
-        el-dropdown-item(icon="el-icon-collection-tag", :command="`tag-${index}`", v-for="(item, index) in tagList", :key="`tagMenu-${index}`", :divided="index == 0", @click="setMenu(`tag-${item.id}`)")
+        el-dropdown-item(icon="el-icon-collection-tag", :command="`tag-${item.id}`", v-for="(item, index) in tagList", :key="`tagMenu-${index}`", :divided="index == 0", @click="setMenu(`tag-${item.id}`)")
           span {{ item.display_name }}
         el-dropdown-item(icon="el-icon-edit", command="edit_tags")
           span Edit tags
@@ -20,11 +22,12 @@
 
 <script>
 import axios from 'axios'
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapGetters, mapMutations } from 'vuex'
 
 export default {
   computed: {
-    ...mapState(['tagList'])
+    ...mapState(['tagList']),
+    ...mapGetters(['menuDisplayName'])
   },
   methods: {
     ...mapMutations(['setMenu', 'setTagMaintainModalVisible']),
@@ -54,4 +57,13 @@ export default {
   .el-dropdown-menu
     max-height: 90vh
     overflow-y: scroll
+  .header-title
+    display: flex
+    align-items: center
+  .mobile-menu-name
+    max-width: 30vw
+    display: inline-block
+    white-space: nowrap
+    text-overflow: ellipsis
+    overflow: hidden
 </style>

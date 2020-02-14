@@ -4,7 +4,9 @@
 
 ### 製作功能
 * 新增、編輯、刪除、刪除後復原筆記
+* 新增、編輯、刪除標籤
 * 垃圾桶等列表
+* RWD
 
 ### 使用技術
 * Pug
@@ -13,6 +15,9 @@
 * Sass
 * Node、Express
 * MySQL
+
+### ERD
+![ERD](/assets/image/NotesERD.png)
 
 ### Build Setup
 

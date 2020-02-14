@@ -86,13 +86,14 @@ export default {
         target: document.querySelector('[name="note-container"]'),
         lock: true
       });
+      this.closeTextBox()
       this.getNoteListByMenu()
       if(this.loading) this.loading.close();
     }
   },
   computed: {
     ...mapState(['menuActive', 'noteList', 'tagList']),
-    ...mapGetters(['isTrash']),
+    ...mapGetters(['isTrash', 'tagId', 'menuDisplayName']),
   },
   methods: {
     ...mapMutations(['setTagList']),
@@ -105,6 +106,7 @@ export default {
     },
     // trigger
     clickTextBox() {
+      if(this.tagId) this.param.tags.push({ display_name: this.menuDisplayName })
       this.showTextBox = true;
       setTimeout(() => {
         document.querySelector('.text-box>.content textarea').focus()

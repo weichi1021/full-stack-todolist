@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import HeaderBar from '~/components/HeaderBar.vue'
 import MenuBar from '~/components/MenuBar.vue'
 import NoteContainer from '~/components/NoteContainer.vue'
@@ -18,11 +19,20 @@ import TagMaintainModal from '~/components/modals/TagMaintainModal'
 import 'element-ui/lib/theme-chalk/display.css'
 
 export default {
+  head() {
+    return {
+      title: this.menuDisplayName,
+      titleTemplate: '%s | Note List'
+    }
+  },
   components: {
     HeaderBar,
     MenuBar,
     NoteContainer,
     TagMaintainModal,
+  },
+  computed: {
+    ...mapGetters(['menuDisplayName']),
   }
 }
 </script>

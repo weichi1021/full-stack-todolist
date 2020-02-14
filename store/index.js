@@ -1,4 +1,5 @@
 import axios from 'axios'
+import _find from 'lodash/find'
 
 export const state = () => ({
   menuActive: 'notes',
@@ -9,6 +10,15 @@ export const state = () => ({
 
 export const getters = {
   isTrash: state => (state.menuActive == 'trash'),
+  tagId: state => {
+    return (/tag/.test(state.menuActive))? state.menuActive.replace('tag-', ''): null
+  },
+  menuDisplayName: (state, getters) => {
+    if(state.menuActive == 'notes') return 'Notes'
+    if(state.menuActive == 'trash') return 'Trash'
+    const findItem = _find(state.tagList, item => getters.tagId == item.id)
+    if(findItem) return findItem.display_name
+  },
 }
 
 export const mutations = {
@@ -58,11 +68,10 @@ export const actions = {
       // console.log(`tags ${id}`, err)
     }
   },
-  async getNoteListByMenu({dispatch ,state}) {
+  async getNoteListByMenu({dispatch, state, getters}) {
     console.log(state.menuActive)
-    if(/tag/.test(state.menuActive)){
-      const tid = state.menuActive.replace('tag-', '')
-      await dispatch('getNoteByTid', tid)
+    if(getters.tagId){
+      await dispatch('getNoteByTid', getters.tagId)
     }else{
       await dispatch('queryNoteList')
     }
