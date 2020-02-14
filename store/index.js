@@ -54,7 +54,7 @@ export const actions = {
       // console.log(`tags ${id}`, err)
     }
   },
-  async menuChange({dispatch ,state}) {
+  async getNoteListByMenu({dispatch ,state}) {
     console.log(state.menuActive)
     if(/tag/.test(state.menuActive)){
       const tid = state.menuActive.replace('tag-', '')

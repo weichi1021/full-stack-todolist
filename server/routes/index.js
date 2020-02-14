@@ -51,6 +51,23 @@ router.get('/tags', async (req, res, next) => {
     res.sendStatus(500)
   }
 })
+router.post('/tags', async (req, res, next) => {
+  try{
+    console.log(req.body.action)
+    switch (req.body.action) {
+      case 'create_tag':
+        let results = await TagController.create(req.body.data.display_name);
+        res.json(results)
+        break;
+
+      default:
+        break;
+    }
+  }catch{
+    console.log('err 500')
+    res.sendStatus(500)
+  }
+})
 router.post('/tags/:id', async (req, res, next) => {
   try{
     let results = await NoteController.getNoteByTid(req.params.id);

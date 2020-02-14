@@ -10,8 +10,7 @@
         .tag-group
           el-tag(type="warning", effect="plain", v-for="(tagItem, tagIndex) in param.tags", :key="`tags-${tagIndex}`", closable, @close="removeTag(tagItem)") {{ tagItem.display_name }}
         .footer
-          el-input.input-new-tag(v-if="tagInputVisible", v-model="tagInput", size="small", @blur="tagInputVisible = false", @keyup.enter.native="addTag()")
-          el-button.button-new-tag(v-else, size="small", @click="openTagInput()") + New Tag
+          el-autocomplete.input-new-tag(v-model="tagInput", :fetch-suggestions="queryTagAutocomplete", :trigger-on-focus="false", size="small", @select="addTag()", @keyup.enter.native="addTag()", placeholder="+ New Tag")
           div
             el-button.note-action(type="text", @click="closeTextBox()") Close
             el-button.note-action.text-primay(type="text", @click="addTextBox()") Create
@@ -49,8 +48,7 @@
         .tag-group
           el-tag(type="warning", effect="plain", v-for="(tagItem, tagIndex) in param.tags", :key="`tags-${tagIndex}`", closable, @close="removeTag(tagItem)") {{ tagItem.display_name }}
         .footer
-          el-input.input-new-tag(v-if="tagInputVisible", v-model="tagInput", size="small", @blur="tagInputVisible = false", @keyup.enter.native="addTag()")
-          el-button.button-new-tag(v-else, size="small", @click="openTagInput()") + New Tag
+          el-autocomplete.input-new-tag(v-model="tagInput", :fetch-suggestions="queryTagAutocomplete", :trigger-on-focus="false", size="small", @select="addTag()", @keyup.enter.native="addTag()", placeholder="+ New Tag")
           div
             el-button.note-action(type="text", @click="closeTextBox()") Close
             el-button.note-action.text-primay(type="text", @click="saveNotes()") Save
@@ -65,10 +63,9 @@ export default {
   data() {
     return {
       loading: null,
-      showTextBox: false,
+      showTextBox: true,
       isCheckList: true,
       editModalVisible: false,
-      tagInputVisible: false,
       tagInput: '',
       param: {
         id: null,
@@ -81,7 +78,7 @@ export default {
   async created() {
     this.loading = this.$loading({ lock: true });
     this.getTagList()
-    await this.queryNoteList();
+    await this.getNoteListByMenu();
     if(this.loading) this.loading.close();
   },
   watch: {
@@ -90,30 +87,22 @@ export default {
         target: document.querySelector('[name="note-container"]'),
         lock: true
       });
-      this.menuChange()
+      this.getNoteListByMenu()
       if(this.loading) this.loading.close();
     }
   },
   computed: {
-    ...mapState(['menuActive', 'noteList']),
+    ...mapState(['menuActive', 'noteList', 'tagList']),
     ...mapGetters(['isTrash']),
   },
   methods: {
     ...mapMutations(['setTagList']),
-    ...mapActions(['getTagList', 'queryNoteList', 'menuChange']),
+    ...mapActions(['getTagList', 'getNoteListByMenu']),
     // function
     delay(interval) {
       return new Promise((resolve) => {
         setTimeout(resolve, interval);
       })
-    },
-    // verify
-    verify() {
-      let pass = true
-      let verifyList = Object.keys(this.param);
-      pass = !(this.param.title.trim() == '' && this.param.content.trim() == '')
-      console.log('verify = '+ pass)
-      return pass
     },
     // trigger
     clickTextBox() {
@@ -125,11 +114,15 @@ export default {
     closeTextBox() {
       this.editModalVisible = false;
       this.showTextBox = false;
+      this.tagInput = '';
       Object.assign(this.$data.param, this.$options.data().param)
     },
     addTextBox() {
       this.showTextBox = false;
-      if(!this.verify()) return
+      if((this.param.title.trim() == '' && this.param.content.trim() == '')) {
+        this.closeTextBox();
+        return
+      }
       this.addNote()
     },
     editTextBox(item) {
@@ -148,15 +141,12 @@ export default {
         this.deleteNote(id);
       })
     },
-    openTagInput() {
-      this.tagInputVisible = true
-      setTimeout(() => {
-        document.querySelector('.input-new-tag input').focus()
-      }, 300)
-    },
     addTag() {
       const findTagIndex = _findIndex(this.param.tags, item => item.display_name == this.tagInput)
-      if((findTagIndex !== -1) || (this.tagInput.trim() == '')) return
+      if((findTagIndex !== -1) || (this.tagInput.trim() == '')){
+        this.tagInput = '';
+        return
+      }
       this.param.tags.push({ display_name: this.tagInput })
       this.tagInput = ''
     },
@@ -167,6 +157,14 @@ export default {
       if(findTagIndex == -1) return
       this.param.tags.splice(findTagIndex, 1)
     },
+    // auto-complete
+    queryTagAutocomplete(queryString = '', cb) {
+      console.log(this.tagList, queryString)
+      const results = this.tagList.filter( item => {
+        return (item.display_name.toLowerCase().indexOf(queryString.toLowerCase()) !== -1)
+      }).map(item => ({...item, value: item.display_name}));
+      cb(results);
+    },
     // api
     async addNote() {
       try{
@@ -174,7 +172,7 @@ export default {
           action: 'add_note',
           data: this.param
         })
-        this.queryNoteList()
+        this.getNoteListByMenu()
         // console.log(resp)
       }catch(err){
         // console.log('add_note', err)
@@ -187,7 +185,7 @@ export default {
           data: this.param
         })
         this.closeTextBox()
-        this.queryNoteList()
+        this.getNoteListByMenu()
         // console.log(resp)
       }catch(err){
         // console.log('save_note', err)
@@ -202,7 +200,7 @@ export default {
             active: false
           }
         })
-        this.queryNoteList()
+        this.getNoteListByMenu()
         // console.log(resp)
       }catch(err){
         // console.log('change_active_note', err)
@@ -217,7 +215,7 @@ export default {
             active: true
           }
         })
-        this.queryNoteList()
+        this.getNoteListByMenu()
         // console.log(resp)
       }catch(err){
         // console.log('change_active_note', err)
@@ -229,7 +227,7 @@ export default {
           action: 'delete_note',
           data: { id }
         })
-        this.queryNoteList()
+        this.getNoteListByMenu()
         // console.log(resp)
       }catch(err){
         // console.log('delete_note', err)
@@ -289,7 +287,7 @@ export default {
       .el-tag + .el-tag
         margin-left: 10px
     .input-new-tag
-      width: 90px
+      width: 110px
   .notes-group
     position: relative
     display: inline-table

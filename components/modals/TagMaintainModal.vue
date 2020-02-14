@@ -1,18 +1,18 @@
 <template lang="pug">
-  el-dialog.tag-maintain-dialog(title="Edit Tags", :visible.sync="modalVisible", width="300px")
+  el-dialog.tag-maintain-dialog(title="Edit Tags", :visible.sync="modalVisible", width="300px", @close="resetData()")
     .body
       .tag-item
         el-input(v-model="tagInput", placeholder="Create new tag", @focus="resetData()")
         .btn-group
-          el-button.note-action.text-primay(@click="btnCreate()")
-            i.el-icon-check
+          el-button.note-action.text-primay(@click="btnAdd()")
+            i.el-icon-plus
       .tag-item(v-for="(item, index) in tagList", :key="`tagMenu-${index}`")
         .tag-text(v-if="params.id !== item.id") {{ item.display_name }}
         el-input(v-else, v-model="params.display_name")
         .btn-group
           el-button.note-action.text-primay(v-if="params.id !== item.id", @click="btnEdit(item)")
             i.el-icon-edit
-          el-button.note-action.text-primay(v-else, @click="updateTag()")
+          el-button.note-action.text-primay(v-else, @click="btnSave()")
             i.el-icon-check
           el-button.note-action(@click="btnDelete(item.id)")
             i.el-icon-delete
@@ -39,14 +39,27 @@ export default {
     ...mapState(['tagList'])
   },
   methods: {
-    ...mapActions(['getTagList']),
-    resetData() {
+    ...mapActions(['getTagList', 'getNoteListByMenu']),
+    resetData(scrollTop = true) {
+      this.tagInput = '';
       Object.assign(this.$data.params, this.$options.data().params)
+      if(scrollTop) document.querySelector('.tag-maintain-dialog .body').scrollTop = 0;
     },
     // trigger
+    btnAdd() {
+      if(this.tagInput.trim().length == 0) return
+      this.createTag();
+    },
     btnEdit(item) {
       const tmp = JSON.parse(JSON.stringify(item))
       this.params = tmp;
+    },
+    btnSave() {
+      if(this.params.display_name.trim().length == 0){
+        this.resetData(false);
+        return
+      }
+      this.updateTag()
     },
     btnDelete(id){
       this.$confirm('We’ll delete this tag and remove it from all of your Keep notes. Your notes won’t be deleted.', 'Confirm', {
@@ -58,6 +71,20 @@ export default {
       });
     },
     // api
+    async createTag() {
+      try{
+        const resp = await axios.post('/api/tags', {
+          action: 'create_tag',
+          data: {
+            display_name: this.tagInput
+          }
+        })
+        this.tagInput = ''
+        this.getTagList();
+      }catch(err){
+        // console.log('err')
+      }
+    },
     async updateTag() {
       try{
         const resp = await axios.put(`/api/tags/${this.params.id}`, {
@@ -67,7 +94,8 @@ export default {
           }
         })
         this.resetData();
-        this.getTagList()
+        this.getTagList();
+        this.getNoteListByMenu();
       }catch(err){
         // console.log(err)
       }
@@ -75,7 +103,8 @@ export default {
     async deleteTag(id) {
       try{
         const resp = await axios.delete(`/api/tags/${id}`)
-        this.getTagList()
+        this.getTagList();
+        this.getNoteListByMenu();
       }catch(err){
         // console.log(err)
       }
@@ -91,7 +120,7 @@ export default {
       padding: 10px
     .btn-group
       display: flex
-      margin-left: 20px
+      margin-left: 10px
     .tag-item
       display: flex
       align-items: center
@@ -119,7 +148,8 @@ export default {
     &.text-primay:hover
       border-color: $primaryColor8
       background-color: $primaryColor10
-  .el-button.note-action:hover
+  .el-button.note-action:hover,
+  .el-button.note-action:focus
     color: $regularText
     border-color: $borderColor1
     background-color: $infoColor3
