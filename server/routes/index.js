@@ -3,12 +3,12 @@ const NoteController = require('../../controllers/NoteController')
 const TagController = require('../../controllers/TagController')
 const router = express.Router();
 
-router.post('/todo-list', async (req, res, next) => {
+router.post('/note-list', async (req, res, next) => {
   console.log(req.body)
   try{
     let results = null;
     switch(req.body.action) {
-      case 'query_todo_list':
+      case 'query_note_list':
         results = await NoteController.read(req.body.data);
         res.json(results)
         break;

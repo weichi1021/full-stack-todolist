@@ -2,7 +2,7 @@
   section(name="tl-header")
     div
       i.el-icon-notebook-2.mr5
-      span Todo List
+      span Note List
 </template>
 
 <style lang="sass" scoped>

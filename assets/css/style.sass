@@ -1,7 +1,36 @@
 @import './_spacing.scss'
 @import './_utilities.sass'
+@import './_var.sass'
+
+html
+  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif
+  font-size: 16px
+  word-spacing: 1px
+  -ms-text-size-adjust: 100%
+  -webkit-text-size-adjust: 100%
+  -moz-osx-font-smoothing: grayscale
+  -webkit-font-smoothing: antialiased
+  box-sizing: border-box
+
+*,
+*:before,
+*:after
+  box-sizing: border-box
+  margin: 0
 
 *::-webkit-scrollbar
   display: none
+
 .text-primay
-  color: #409EFF !important
+  color: $primaryColor1 !important
+
+
+// .el-button
+//   color: $regularText
+//   font-size: 14px
+//   padding: 8px
+//   &:hover
+//     color: $regularText
+//     background-color: $infoColor3
+//   &.text-primay:hover
+//     background-color: $primaryColor9

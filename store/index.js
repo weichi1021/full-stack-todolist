@@ -7,6 +7,7 @@ export const state = () => ({
 })
 
 export const getters = {
+  isTrash: state => (state.menuActive == 'trash'),
 }
 
 export const mutations = {
@@ -30,4 +31,36 @@ export const actions = {
       // console.log(err)
     }
   },
+  async queryNoteList({commit, getters}) {
+    try{
+      const resp = await axios.post('/api/note-list',  {
+        action: 'query_note_list',
+        data: {
+          active: !getters.isTrash
+        }
+      })
+      commit('setNoteList', resp.data);
+      // console.log(resp)
+    }catch(err){
+      // console.log('query_note_list', err)
+    }
+  },
+  async getNoteByTid({commit}, tid) {
+    try{
+      const resp = await axios.post(`/api/tags/${tid}`)
+      commit('setNoteList', resp.data);
+      // console.log(resp)
+    }catch(err){
+      // console.log(`tags ${id}`, err)
+    }
+  },
+  async menuChange({dispatch ,state}) {
+    console.log(state.menuActive)
+    if(/tag/.test(state.menuActive)){
+      const tid = state.menuActive.replace('tag-', '')
+      await dispatch('getNoteByTid', tid)
+    }else{
+      await dispatch('queryNoteList')
+    }
+  }
 }

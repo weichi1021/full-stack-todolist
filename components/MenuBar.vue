@@ -1,6 +1,6 @@
 <template lang="pug">
   section(name="tl-menu-group")
-    el-menu(:default-active="menuActive", @select="setMenu", :collapse="false")
+    el-menu(:default-active="menuActive", @select="setMenu")
       el-menu-item(index="notes")
         i.el-icon-notebook-2
         span Notes
@@ -8,7 +8,7 @@
       el-menu-item(:index="`tag-${item.id}`", v-for="(item, index) in tagList", :key="`tagMenu-${index}`")
         i.el-icon-collection-tag
         span {{ item.display_name }}
-      el-menu-item(index="edit", @click="$refs.TagMaintainModal.modalVisible = true")
+      li.el-menu-item(@click="$refs.TagMaintainModal.modalVisible = true")
         i.el-icon-edit
         span Edit tags
       el-divider

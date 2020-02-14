@@ -4,17 +4,17 @@
       .tag-item
         el-input(v-model="tagInput", placeholder="Create new tag", @focus="resetData()")
         .btn-group
-          el-button(@click="btnCreate()")
+          el-button.note-action.text-primay(@click="btnCreate()")
             i.el-icon-check
       .tag-item(v-for="(item, index) in tagList", :key="`tagMenu-${index}`")
         .tag-text(v-if="params.id !== item.id") {{ item.display_name }}
         el-input(v-else, v-model="params.display_name")
         .btn-group
-          el-button(v-if="params.id !== item.id", @click="btnEdit(item)")
+          el-button.note-action.text-primay(v-if="params.id !== item.id", @click="btnEdit(item)")
             i.el-icon-edit
-          el-button(v-else, @click="updateTag()")
+          el-button.note-action.text-primay(v-else, @click="updateTag()")
             i.el-icon-check
-          el-button(@click="btnDelete(item.id)")
+          el-button.note-action(@click="btnDelete(item.id)")
             i.el-icon-delete
     .footer.text-right
       el-button(type="text", @click="modalVisible = false") Done
@@ -49,7 +49,7 @@ export default {
       this.params = tmp;
     },
     btnDelete(id){
-      this.$confirm('We’ll delete this label and remove it from all of your Keep notes. Your notes won’t be deleted.', 'Confirm', {
+      this.$confirm('We’ll delete this tag and remove it from all of your Keep notes. Your notes won’t be deleted.', 'Confirm', {
         confirmButtonText: 'Delete',
         cancelButtonText: 'Cancel',
       }).then(() => {
@@ -85,6 +85,7 @@ export default {
 </script>
 
 <style lang="sass">
+  @import '~/assets/css/_var.sass'
   .tag-maintain-dialog .el-dialog
     .el-dialog__body
       padding: 10px
@@ -104,7 +105,22 @@ export default {
       max-height: 450px
       overflow-y: scroll
     .footer
-      border-top: 1px solid #DCDFE6
-      padding: 10px 10px 5px
-
+      border-top: 1px solid $borderColor1
+      padding: 10px 10px 0px
+</style>
+<style lang="sass" scoped>
+  @import '~/assets/css/_var.sass'
+  .el-button.note-action
+    font-size: 14px
+    padding: 8px
+  .el-button.text-primay.note-action
+    color: $regularText
+    border-color: $primaryColor8
+    &.text-primay:hover
+      border-color: $primaryColor8
+      background-color: $primaryColor10
+  .el-button.note-action:hover
+    color: $regularText
+    border-color: $borderColor1
+    background-color: $infoColor3
 </style>

@@ -1,42 +1,42 @@
 <template lang="pug">
-  section(name="tl-notes-container")
+  section.p25(name="note-container")
     //- input
-    div.mb25.pt25.prl30(v-if="!isTrash")
-      .text-line(v-show="!showTextBox")
-        .text-line-input(@click="clickTextBox()") Take a note...
-        //- el-button(type="text")
-        //-   i.el-icon-finished
-      .text-box(v-show="showTextBox")
+    div.mb25(v-if="!isTrash")
+      .text-box(v-if="showTextBox")
         .header
           el-input(type="text", v-model="param.title", placeholder="Title")
         .content
           el-input(type="textarea", v-model="param.content", :rows="4", resize="none", placeholder="Take a note...")
         .tag-group
-          el-tag(type="info", effect="plain", v-for="(tagItem, tagIndex) in param.tags", :key="`tags-${tagIndex}`", closable, @close="removeTag(tagItem)") {{ tagItem.display_name }}
+          el-tag(type="warning", effect="plain", v-for="(tagItem, tagIndex) in param.tags", :key="`tags-${tagIndex}`", closable, @close="removeTag(tagItem)") {{ tagItem.display_name }}
         .footer
           el-input.input-new-tag(v-if="tagInputVisible", v-model="tagInput", size="small", @blur="tagInputVisible = false", @keyup.enter.native="addTag()")
           el-button.button-new-tag(v-else, size="small", @click="openTagInput()") + New Tag
           div
-            el-button(type="text", @click="closeTextBox()") Close
-            el-button.text-primay(type="text", @click="addTextBox()") Create
-    //- show
-    div.notes-container
-      .notes-group(v-for="(item, index) in notesList", :key="`notes-${index}`")
+            el-button.note-action(type="text", @click="closeTextBox()") Close
+            el-button.note-action.text-primay(type="text", @click="addTextBox()") Create
+      .text-line(v-else)
+        .text-line-input(@click="clickTextBox()") Take a note...
+        //- el-button(type="text")
+        //-   i.el-icon-finished
+    //- container
+    div
+      .notes-group(v-for="(item, index) in noteList", :key="`notes-${index}`")
         .header(v-if="item.title") {{ item.title }}
         .conten(v-if="item.content")
           pre {{ item.content }}
         .content(v-if="!item.title && !item.content") Empty note
         .tag-group.mt10
-          el-tag(type="info" v-for="(tagItem, tagIndex) in item.tags", :key="`tags-${tagIndex}`") {{ tagItem.display_name }}
+          el-tag(type="warning", v-for="(tagItem, tagIndex) in item.tags", :key="`tags-${tagIndex}`") {{ tagItem.display_name }}
         .footer.btn-pos-right(v-if="!isTrash")
-          el-button.text-primay(type="text", @click="editTextBox(item)")
+          el-button.note-action.text-primay(type="text", @click="editTextBox(item)")
             i.el-icon-edit
-          el-button(type="text", @click="removeNote(item.id)")
+          el-button.note-action(type="text", @click="removeNote(item.id)")
             i.el-icon-delete
         .footer.btn-pos-left(v-if="isTrash")
-          el-button(type="text", @click="deleteTextBox(item.id)")
+          el-button.note-action(type="text", @click="deleteTextBox(item.id)")
             i.el-icon-delete-solid
-          el-button(type="text", @click="restoreNote(item.id)")
+          el-button.note-action(type="text", @click="restoreNote(item.id)")
             i.el-icon-refresh-left
     //- modal
     el-dialog.text-box-dialog(:visible.sync="editModalVisible", width="500px", :show-close="false", @close="closeTextBox()")
@@ -47,19 +47,19 @@
           el-input(type="textarea", v-model="param.content", :rows="4", resize="none", placeholder="Take a note...")
         .footer.text-right
         .tag-group
-          el-tag(type="info", effect="plain", v-for="(tagItem, tagIndex) in param.tags", :key="`tags-${tagIndex}`", closable, @close="removeTag(tagItem)") {{ tagItem.display_name }}
+          el-tag(type="warning", effect="plain", v-for="(tagItem, tagIndex) in param.tags", :key="`tags-${tagIndex}`", closable, @close="removeTag(tagItem)") {{ tagItem.display_name }}
         .footer
           el-input.input-new-tag(v-if="tagInputVisible", v-model="tagInput", size="small", @blur="tagInputVisible = false", @keyup.enter.native="addTag()")
           el-button.button-new-tag(v-else, size="small", @click="openTagInput()") + New Tag
           div
-            el-button(type="text", @click="closeTextBox()") Close
-            el-button.text-primay(type="text", @click="saveNotes()") Save
+            el-button.note-action(type="text", @click="closeTextBox()") Close
+            el-button.note-action.text-primay(type="text", @click="saveNotes()") Save
 </template>
 
 <script>
 import axios from 'axios'
 import _findIndex from 'lodash/findIndex'
-import { mapState, mapMutations, mapActions } from 'vuex'
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 
 export default {
   data() {
@@ -76,40 +76,31 @@ export default {
         content: '',
         tags: [],
       },
-      notesList: [],
     }
   },
-  created() {
+  async created() {
     this.loading = this.$loading({ lock: true });
     this.getTagList()
-    this.queryTodoList();
+    await this.queryNoteList();
+    if(this.loading) this.loading.close();
   },
   watch: {
     async menuActive(val) {
-      console.log(val)
-      if(val == 'edit') return
       this.loading = this.$loading({
-        target: document.querySelector('[name="tl-notes-container"]'),
+        target: document.querySelector('[name="note-container"]'),
         lock: true
       });
-      await this.delay(1000);
-      if(/tag/.test(val)){
-        const tid = val.replace('tag-', '')
-        this.getNoteByTid(tid);
-      }else{
-        this.queryTodoList()
-      }
+      this.menuChange()
+      if(this.loading) this.loading.close();
     }
   },
   computed: {
-    ...mapState(['menuActive']),
-    isTrash() {
-      return (this.menuActive == 'trash')
-    },
+    ...mapState(['menuActive', 'noteList']),
+    ...mapGetters(['isTrash']),
   },
   methods: {
     ...mapMutations(['setTagList']),
-    ...mapActions(['getTagList']),
+    ...mapActions(['getTagList', 'queryNoteList', 'menuChange']),
     // function
     delay(interval) {
       return new Promise((resolve) => {
@@ -177,29 +168,13 @@ export default {
       this.param.tags.splice(findTagIndex, 1)
     },
     // api
-    async queryTodoList() {
-      try{
-        const resp = await axios.post('/api/todo-list',  {
-          action: 'query_todo_list',
-          data: {
-            active: !this.isTrash
-          }
-        })
-        this.notesList = resp.data;
-        // console.log(resp)
-      }catch(err){
-        // console.log('query_todo_list', err)
-      }
-      await this.delay(500);
-      if(this.loading) this.loading.close();
-    },
     async addNote() {
       try{
-        const resp = await axios.post('/api/todo-list', {
+        const resp = await axios.post('/api/note-list', {
           action: 'add_note',
           data: this.param
         })
-        this.queryTodoList()
+        this.queryNoteList()
         // console.log(resp)
       }catch(err){
         // console.log('add_note', err)
@@ -207,12 +182,12 @@ export default {
     },
     async saveNotes(item) {
       try{
-        const resp = await axios.post('/api/todo-list', {
+        const resp = await axios.post('/api/note-list', {
           action: 'save_note',
           data: this.param
         })
         this.closeTextBox()
-        this.queryTodoList()
+        this.queryNoteList()
         // console.log(resp)
       }catch(err){
         // console.log('save_note', err)
@@ -220,14 +195,14 @@ export default {
     },
     async removeNote(id) {
       try{
-        const resp = await axios.post('/api/todo-list', {
+        const resp = await axios.post('/api/note-list', {
           action: 'change_active_note',
           data: {
             id: id,
             active: false
           }
         })
-        this.queryTodoList()
+        this.queryNoteList()
         // console.log(resp)
       }catch(err){
         // console.log('change_active_note', err)
@@ -235,14 +210,14 @@ export default {
     },
     async restoreNote(id) {
       try{
-        const resp = await axios.post('/api/todo-list', {
+        const resp = await axios.post('/api/note-list', {
           action: 'change_active_note',
           data: {
             id: id,
             active: true
           }
         })
-        this.queryTodoList()
+        this.queryNoteList()
         // console.log(resp)
       }catch(err){
         // console.log('change_active_note', err)
@@ -250,39 +225,49 @@ export default {
     },
     async deleteNote(id) {
       try{
-        const resp = await axios.post('/api/todo-list', {
+        const resp = await axios.post('/api/note-list', {
           action: 'delete_note',
           data: { id }
         })
-        this.queryTodoList()
+        this.queryNoteList()
         // console.log(resp)
       }catch(err){
         // console.log('delete_note', err)
       }
-    },
-    async getNoteByTid(tid) {
-      try{
-        const resp = await axios.post(`/api/tags/${tid}`)
-        this.notesList = resp.data;
-        // console.log(resp)
-      }catch(err){
-        // console.log(`tags ${tid}`, err)
-      }
-      await this.delay(2000);
-      if(this.loading) this.loading.close();
     },
   }
 }
 
 </script>
 
+<style lang="sass">
+  @import '~/assets/css/_var.sass'
+  .text-box .header .el-input>input,
+  .text-box .content .el-textarea>textarea
+    border: none
+    color: $primaryText
+    font-size: 16px
+  .text-box .el-input>input::placeholder,
+  .text-box .el-textarea>textarea::placeholder
+    color: $regularText
+  .text-box .header .el-input>input
+    font-weight: bold
+  .text-box-dialog .el-dialog
+    .text-box
+      box-shadow: none
+      border: none
+    .el-dialog__header,
+    .el-dialog__body
+      padding: 0px
+</style>
 <style lang="sass" scoped>
+  @import '~/assets/css/_var.sass'
   .text-box,
   .text-line
-    border: 1px solid #E4E7ED
+    border: 1px solid $borderColor2
     border-radius: 5px
-    color: #606266
-    box-shadow: 2px 2px 5px 0px #E4E7ED
+    color: $regularText
+    box-shadow: 2px 2px 5px 0px $borderColor2
     max-width: 500px
     margin: 0px auto
   .text-line
@@ -305,14 +290,12 @@ export default {
         margin-left: 10px
     .input-new-tag
       width: 90px
-  .notes-container
-    padding: 0px 20px
   .notes-group
     position: relative
     display: inline-table
-    border: 1px solid #E4E7ED
+    border: 1px solid $borderColor2
     border-radius: 5px
-    padding: 15px 15px 35px
+    padding: 15px 15px 50px
     min-width: 240px
     min-height: 120px
     margin: 10px
@@ -335,44 +318,14 @@ export default {
   pre
     font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif
     line-height: 1.5
-  .el-button
-    color: #606266
+  .el-button.note-action
+    color: $regularText
     font-size: 14px
     padding: 8px
     &:hover
-      color: #606266
-      background-color: #f4f4f5
+      color: $regularText
+      background-color: $infoColor3
     &.text-primay:hover
-      background-color: #ecf5ff
-  .button-new-tag:hover
-    border: 1px solid #dcdfe6
+      background-color: $primaryColor10
 </style>
-<style lang="sass">
-  .text-box .header .el-input>input,
-  .text-box .content .el-textarea>textarea
-    border: none
-    color: #303133
-    font-size: 16px
-  .text-box .el-input>input::placeholder,
-  .text-box .el-textarea>textarea::placeholder
-    color: #606266
-  .text-box .el-input>input
-    font-weight: bold
-  .el-button
-    color: #606266
-    font-size: 14px
-    padding: 8px
-    &:hover
-      color: #606266
-      background-color: #f4f4f5
-    &.text-primay:hover
-      background-color: #ecf5ff
-  .text-box-dialog .el-dialog
-    border-radius: 5px
-    .text-box
-      box-shadow: none
-      border: none
-    .el-dialog__header,
-    .el-dialog__body
-      padding: 0px
-</style>
+
