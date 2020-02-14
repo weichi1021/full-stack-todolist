@@ -5,7 +5,7 @@
       span.mobile-menu-name.hidden-md-and-up {{ menuDisplayName }}
       span.hidden-md-and-up &nbsp;|&nbsp;
       span Note List
-    el-dropdown.hidden-md-and-up(@command="handleCommand")
+    el-dropdown.hidden-md-and-up
       span
         i.el-icon-arrow-down
       el-dropdown-menu

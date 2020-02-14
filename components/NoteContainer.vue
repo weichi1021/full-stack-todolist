@@ -38,7 +38,7 @@
           el-button.note-action(type="text", @click="restoreNote(item.id)")
             i.el-icon-refresh-left
     //- modal
-    el-dialog.text-box-dialog(:visible.sync="editModalVisible", width="500px", :show-close="false", @close="closeTextBox()")
+    el-dialog.text-box-dialog(:visible.sync="editModalVisible", width="auto", :show-close="false", @close="closeTextBox()")
       .text-box
         .header
           el-input(type="text", v-model="param.title", placeholder="Title")
@@ -252,6 +252,7 @@ export default {
   .text-box .header .el-input>input
     font-weight: bold
   .text-box-dialog .el-dialog
+    max-width: 500px
     .text-box
       box-shadow: none
       border: none
