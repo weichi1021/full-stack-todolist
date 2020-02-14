@@ -5,7 +5,7 @@
       span.mobile-menu-name.hidden-md-and-up {{ menuDisplayName }}
       span.hidden-md-and-up &nbsp;|&nbsp;
       span Note List
-    el-dropdown.hidden-md-and-up
+    el-dropdown.hidden-md-and-up(@command="handleCommand", trigger="click")
       span
         i.el-icon-arrow-down
       el-dropdown-menu
@@ -32,7 +32,7 @@ export default {
   methods: {
     ...mapMutations(['setMenu', 'setTagMaintainModalVisible']),
     handleCommand(command){
-      console.log(command)
+      // console.log(command)
       if(command == 'edit_tags'){
         this.setTagMaintainModalVisible(true)
         return
