@@ -6,7 +6,7 @@
         .header
           el-input(type="text", v-model="param.title", placeholder="Title")
         .content
-          el-input(type="textarea", v-model="param.content", :rows="4", resize="none", placeholder="Take a note...")
+          el-input(type="textarea", v-model="param.content", resize="none", :autosize="{ minRows: 4}", placeholder="Take a note...")
         .tag-group
           el-tag(type="warning", effect="plain", v-for="(tagItem, tagIndex) in param.tags", :key="`tags-${tagIndex}`", closable, @close="removeTag(tagItem)") {{ tagItem.display_name }}
         .footer
@@ -43,7 +43,7 @@
         .header
           el-input(type="text", v-model="param.title", placeholder="Title")
         .content
-          el-input(type="textarea", v-model="param.content", :rows="4", resize="none", placeholder="Take a note...")
+          el-input(type="textarea", v-model="param.content", resize="none", :autosize="{ minRows: 4}", placeholder="Take a note...")
         .footer.text-right
         .tag-group
           el-tag(type="warning", effect="plain", v-for="(tagItem, tagIndex) in param.tags", :key="`tags-${tagIndex}`", closable, @close="removeTag(tagItem)") {{ tagItem.display_name }}

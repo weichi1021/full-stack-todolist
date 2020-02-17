@@ -2,10 +2,12 @@
 >
 > 作品網址：https://full-stack-todolist.herokuapp.com/
 
+![image](/assets/image/full-stack-todo-list.png)
+
 ### 製作功能
 * 新增、編輯、刪除、刪除後復原筆記
 * 新增、編輯、刪除標籤
-* 垃圾桶等列表
+* 全部、標籤、垃圾桶等列表
 * RWD
 
 ### 使用技術

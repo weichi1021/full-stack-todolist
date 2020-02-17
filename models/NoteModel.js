@@ -13,7 +13,7 @@ note.create = (title, content) => {
 }
 note.read = async (active) => {
   return await new Promise((resolve, reject) => {
-    const sql = `SELECT id, title, content FROM notes WHERE is_active = ${active};`
+    const sql = `SELECT n.id, n.title, n.content, GROUP_CONCAT('{"id":', t.id, ',"display_name":"', t.display_name, '"} ') AS tags FROM notes n LEFT JOIN relation r ON n.id = r.nid LEFT JOIN note_tags t ON t.id = r.tid WHERE is_active = ${active} GROUP BY n.id ORDER BY n.id;`
     pool.query(sql, (err, results) => {
       if(err) return reject(err)
       return resolve(results)
