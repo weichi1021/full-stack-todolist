@@ -106,7 +106,11 @@ export default {
     },
     // trigger
     clickTextBox() {
-      if(this.tagId) this.param.tags.push({ display_name: this.menuDisplayName })
+      this.param.tags.length = 0;
+      if(this.tagId){
+        this.tagInput = this.menuDisplayName
+        this.addTag()
+      }
       this.showTextBox = true;
       setTimeout(() => {
         document.querySelector('.text-box>.content textarea').focus()
@@ -174,6 +178,7 @@ export default {
           data: this.param
         })
         this.getNoteListByMenu()
+        Object.assign(this.$data.param, this.$options.data().param)
         // console.log(resp)
       }catch(err){
         // console.log('add_note', err)
