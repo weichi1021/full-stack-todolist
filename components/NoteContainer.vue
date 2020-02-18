@@ -87,7 +87,7 @@ export default {
         lock: true
       });
       this.closeTextBox()
-      this.getNoteListByMenu()
+      await this.getNoteListByMenu()
       if(this.loading) this.loading.close();
     }
   },
@@ -177,8 +177,9 @@ export default {
           action: 'add_note',
           data: this.param
         })
-        this.getNoteListByMenu()
         Object.assign(this.$data.param, this.$options.data().param)
+        await this.delay(1500)
+        await this.getNoteListByMenu()
         // console.log(resp)
       }catch(err){
         // console.log('add_note', err)
@@ -191,7 +192,7 @@ export default {
           data: this.param
         })
         this.closeTextBox()
-        this.getNoteListByMenu()
+        await this.getNoteListByMenu()
         // console.log(resp)
       }catch(err){
         // console.log('save_note', err)
@@ -206,7 +207,7 @@ export default {
             active: false
           }
         })
-        this.getNoteListByMenu()
+        await this.getNoteListByMenu()
         // console.log(resp)
       }catch(err){
         // console.log('change_active_note', err)
@@ -221,7 +222,7 @@ export default {
             active: true
           }
         })
-        this.getNoteListByMenu()
+        await this.getNoteListByMenu()
         // console.log(resp)
       }catch(err){
         // console.log('change_active_note', err)
@@ -233,7 +234,7 @@ export default {
           action: 'delete_note',
           data: { id }
         })
-        this.getNoteListByMenu()
+        await this.getNoteListByMenu()
         // console.log(resp)
       }catch(err){
         // console.log('delete_note', err)

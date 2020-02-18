@@ -67,7 +67,7 @@ note.undoTag = (nid) => {
 }
 note.getNoteByTid = (tid) => {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT r.nid AS id, n.title, n.content FROM relation AS r LEFT JOIN notes AS n ON n.id = r.nid WHERE r.tid = ${tid};`
+    const sql = `SELECT n.id, n.title, n.content, GROUP_CONCAT('{"id":', t.id, ',"display_name":"', t.display_name, '"} ') AS tags FROM notes n LEFT JOIN relation r ON n.id = r.nid LEFT JOIN note_tags t ON t.id = r.tid WHERE r.tid = ${tid} AND is_active = 1 GROUP BY n.id ORDER BY n.id;`
     pool.query(sql, (err, results) => {
       if(err) return reject(err)
       return resolve(results)

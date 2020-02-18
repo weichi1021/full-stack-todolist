@@ -61,6 +61,7 @@ export const actions = {
   },
   async getNoteByTid({commit}, tid) {
     try{
+      console.log(tid)
       const resp = await axios.post(`/api/tags/${tid}`)
       commit('setNoteList', resp.data);
       // console.log(resp)
