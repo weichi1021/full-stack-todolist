@@ -192,6 +192,7 @@ export default {
           data: this.param
         })
         this.closeTextBox()
+        await this.delay(1500)
         await this.getNoteListByMenu()
         // console.log(resp)
       }catch(err){
